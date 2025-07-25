@@ -1,14 +1,20 @@
 import 'read.dart';
 import 'objectLibrary.dart';
 
-class Magazine extends Objectlibrary with Read {
+class Magazine  with Read implements Objectlibrary {
   final int number;
   final String editorial;
+  @override
+  String id;
+  @override
+  String title;
+  @override
+  int yearPublication;
 
   Magazine({
-    required super.id,
-    required super.title,
-    required super.yearPublication,
+    required this.id,
+    required this.title,
+    required this.yearPublication,
     required this.number,
     required this.editorial,
   });

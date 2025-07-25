@@ -1,113 +1,137 @@
 import 'data.dart';
-import 'objectLibrary.dart';
 import 'user.dart';
 import 'magazine.dart';
 import 'book.dart';
-import 'error.dart';
 
 class Library {
-  List<Objectlibrary> _collection = [];
+  List<Book> _bookCollection = [];
+  List<Magazine> _magazineCollection = [];
   List<User> _users = [];
 
-  List<Objectlibrary> get collection {
-    return _collection;
+  List<Book> get bookCollection {
+    return _bookCollection;
   }
 
-  List<User> get user {
+  List<Magazine> get magazineCollection {
+    return _magazineCollection;
+  }
+
+  List<User> get users {
     return _users;
   }
 
   Future<void> loadInitialData() async {
     await Future.delayed(Duration(seconds: 1));
-    _collection.addAll(books);
+    _bookCollection.addAll(books);
     await Future.delayed(Duration(seconds: 1));
-    _collection.addAll(magazines);
+    _magazineCollection.addAll(magazines);
   }
 
-  void addElement(Objectlibrary object) {
-    _collection.add(object);
+  void addBook(Book book) {
+    _bookCollection.add(book);
   }
 
-  void registerUser(User user) {
+  void addMagazine(Magazine magazine) {
+    _magazineCollection.add(magazine);
+  }
+
+  void addUser(User user) {
     _users.add(user);
   }
 
-  Objectlibrary? findObjectByID(String id){
-    for(var object in _collection) {
-      if(object.id.toLowerCase() == id.toLowerCase()){
-        return object;
-      } 
+  Book? findBookByID(String id) {
+    for (var book in _bookCollection) {
+      if (book.id.toLowerCase() == id.toLowerCase()) {
+        return book;
+      }
     }
     return null;
   }
 
-  Objectlibrary? findByTitle(String title){
-    for(var object in _collection) {
-      if(object.title.toLowerCase() == title.toLowerCase()){
-        return object;
-      } 
+  Magazine? findMagazineByID(String id) {
+    for (var magazine in _magazineCollection) {
+      if (magazine.id.toLowerCase() == id.toLowerCase()) {
+        return magazine;
+      }
     }
     return null;
   }
 
-  User? findUserByName(String name){
-    for(var user in _users) {
-      if(user.name.toLowerCase() == name.toLowerCase()){
+  Book? findBookByTitle(String title) {
+    for (var book in _bookCollection) {
+      if (book.title.toLowerCase() == title.toLowerCase()) {
+        return book;
+      }
+    }
+    return null;
+  }
+
+  Magazine? findMagazineByTitle(String title) {
+    for (var magazine in _magazineCollection) {
+      if (magazine.title.toLowerCase() == title.toLowerCase()) {
+        return magazine;
+      }
+    }
+    return null;
+  }
+
+  User? findUserByName(String name) {
+    for (var user in _users) {
+      if (user.name.toLowerCase() == name.toLowerCase()) {
         return user;
-      } 
+      }
     }
     return null;
   }
 
   void showCataloge() {
     print('\nCatalogo');
-    for(var element in _collection) {
-      element.showInfo();
-    } 
-  } 
-  
+
+    print('\nBooks');
+    for (var book in _bookCollection) {
+      book.showInfo();
+    }
+
+    print('\nMagazines');
+    for (var magazine in _magazineCollection) {
+      magazine.showInfo();
+    }
+  }
+
   void showUsers() {
-    print('\nCatalogo');
-    for(var user in _users) {
+    print('\nUsers');
+    for (var user in _users) {
       user.showInfo();
-    } 
-  } 
-
-  void lendBook(User userToLent, Book bookToLent){
-    if(_users.contains(userToLent)){
-      for(var user in _users){
-        if (userToLent.id == user.id){
-          userToLent.takeLendBook(bookToLent);
-        }
-      }
-    }else{
-      throw UserException('User not register');
     }
   }
 
-  void userReadMegazine(User userToLent, Magazine magazineToLent){
-    if(_users.contains(userToLent)){
-      for(var user in _users){
-        if (userToLent.id == user.id){
-          userToLent.readMagazine(magazineToLent);
-        }
+  void lendBookUser(User userToLent, Book bookToLent) {
+    for (var user in users) {
+      if (userToLent.id == user.id) {
+        userToLent.takeLendBook(bookToLent);
       }
-    }else{
-      throw UserException('User not register');
     }
   }
 
-  void userReturnBook(User user,Book book) {
-    for(User userRegister in  _users){
-      if(user.id == userRegister.id){
+  void readUserMegazine(User userToLent, Magazine magazineToLent) {
+    for (var user in users) {
+      if (userToLent.id == user.id) {
+        userToLent.readMagazine(magazineToLent);
+      }
+    }
+  }
+
+  void returnUserBook(User user, Book book) {
+    for (var userRegister in users) {
+      if (user.id == userRegister.id) {
         userRegister.returnBook(book);
       }
     }
   }
-  
-  void userReturnMagazine(User user,Magazine magazine) {
-    for(User userRegister in  _users){
-      if(user.id == userRegister.id){
+
+  void returnUserMagazine(User user, Magazine magazine) {
+    for (User userRegister in users) {
+      if (user.id == userRegister.id) {
         userRegister.letReadMagazine(magazine);
       }
     }

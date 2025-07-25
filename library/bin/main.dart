@@ -1,208 +1,288 @@
 import 'dart:io';
 import 'dart:math';
+import '../lib/error.dart';
 import '../lib/magazine.dart';
-import '../lib/objectLibrary.dart';
 import '../lib/user.dart';
 import '../lib/book.dart';
 import '../lib/library.dart';
 
-void main()async {
+void main() async {
   final Library library = Library();
-  
+
   // Cargar datos iniciales
   try {
-    print('Iniciando carga de datos...');  
+    print('Iniciando carga de datos...');
     await library.loadInitialData();
     library.showCataloge();
     print('Datos cargados exitosamente.\n');
-  } catch (e) {
-    print('Error al cargar datos: $e');
+  } catch (err) {
+    print('Error al cargar datos: $err');
   }
 
   String optionMenu;
-  
-  do {    
+
+  do {
     // Mostrar menú
     menu();
-    
+
     // Leer opción del usuario
     optionMenu = stdin.readLineSync()?.trim() ?? '';
-    
+
     // Procesar opción
-    switch(optionMenu) {
+    switch (optionMenu) {
       case '1':
         // Registrar usuario
         print('REGISTRAR NUEVO USUARIO\n');
         print('Nombre: ');
         final String name = stdin.readLineSync()?.trim() ?? '';
         if (name.isNotEmpty) {
-          library.registerUser(User(name: name, id: getUserID()));
-          print('\nUsuario registrado con éxito.');
+          library.addUser(User(name: name, id: getUserID()));
+          print('\nUsuario registrado con éxito.\n');
         } else {
-          print('\nError: El nombre no puede estar vacío.');
+          print('\nError: El nombre no puede estar vacío.\n');
         }
         break;
-        
+
       case '2':
-        // Buscar por ID
-        print('BUSCAR POR ID\n');
-        print('Ingrese el ID a buscar: ');
-        final String id = stdin.readLineSync()?.trim() ?? '';
-        final object = library.findObjectByID(id);
-        if (object != null) {
+        // Buscar Revista por titulo
+        print('\nBUSCAR REVISTA\n');
+        print('\nIngrese el titulo a buscar: ');
+        final String title = stdin.readLineSync()?.trim() ?? '';
+        Magazine? magazine = library.findMagazineByTitle(title);
+
+        if (magazine != null) {
           print('\nResultado de búsqueda:');
-          object.showInfo();
+          magazine.showInfo();
         } else {
-          print('\nNo se encontró ningún objeto con ese ID.');
+          print('\nNo se encontró ninguna revista con ese titulo $title.\n');
         }
-        //await pause();
         break;
-        
+
       case '3':
-        // Buscar por título
-        print('BUSCAR POR TÍTULO\n');
+        // Buscar Libro por título
+        print('BUSCAR BOOK\n');
+
         print('Ingrese el título a buscar: ');
         final String title = stdin.readLineSync()?.trim() ?? '';
-        final object = library.findByTitle(title);
-        if (object != null) {
+        Book? book = library.findBookByTitle(title);
+
+        if (book != null) {
           print('\nResultado de búsqueda:');
-          object.showInfo();
+          book.showInfo();
         } else {
-          print('\nNo se encontró ningún objeto con ese título.');
+          print('\nNo se encontró ningún libro con ese título.\n');
         }
         break;
-        
+
       case '4':
         // Leer revista
         print('LEER REVISTA\n');
         print('Usuario a prestar: ');
         final String name = stdin.readLineSync()?.trim() ?? '';
         User? user = library.findUserByName(name);
-
+      
         print('Titlulo de la  revista a leer: ');
         final String title = stdin.readLineSync()?.trim() ?? '';
-        Objectlibrary? magazine = library.findByTitle(title);
+        Magazine? magazine = library.findMagazineByTitle(title);
 
-        if(user != null) {
-          library.userReadMegazine(user, magazine as Magazine);
-        } else {
-          print('Usuario no registrado');
+        try { 
+          userValidate(user);
+          magazineValidate(magazine);
+
+          Future.delayed(Duration(seconds: 2));
+          library.readUserMegazine(user!, magazine!);
+
+        } on UserException catch(err) {
+          print(err);
+        } on ObjectException catch(err) {
+          print(err);
         }
-        await Future.delayed(Duration(seconds: 2));
-        print('Usuario: ${user?.name} leyendo ${magazine?.title}');
+
         break;
-    
+
       case '5':
         // Prestar libro
-      
+
         // User user;
         print('PRESTAR\n');
-        
+
         print('Usuario a prestar: ');
         final String name = stdin.readLineSync()?.trim() ?? '';
         User? user = library.findUserByName(name);
 
         print('Titlulo del libro a leer: ');
         final String title = stdin.readLineSync()?.trim() ?? '';
-        Objectlibrary? book = library.findByTitle(title);
-        
-        if(user != null) {
-          library.lendBook(user, book as Book);
-        } else {
-          print('Usuario no registrado');
+        Book? book = library.findBookByTitle(title);
+         
+        try { 
+          userValidate(user);
+          bookValidate(book);
+
+          Future.delayed(Duration(seconds: 2));
+          library.lendBookUser(user!, book!);
+
+        } on UserException catch(err) {
+          print(err);
+        } on ObjectException catch(err) {
+          print(err);
         }
-        await Future.delayed(Duration(seconds: 2));
-        print('Usuario: ${user?.name} tiene prestado ${book?.title}');
+
         break;
-        
+
       case '6':
         // Devolver Libro
-      
-        print('DEVOLVER LIBRO\n');
-        
+
+        print('\nDEVOLVER LIBRO');
+
         print('Usuario que va a devolver : ');
         final String name = stdin.readLineSync()?.trim() ?? '';
         User? user = library.findUserByName(name);
 
         print('Titlulo del libro a devolver: ');
         final String title = stdin.readLineSync()?.trim() ?? '';
-        Objectlibrary? book = library.findByTitle(title);
-        
-        if(user != null) {
-          library.userReturnBook(user, book as Book);
-        } else {
-          print('Usuario no registrado');
+        Book? book = library.findBookByTitle(title);
+
+        try { 
+          userValidate(user);
+          bookValidate(book);
+
+          Future.delayed(Duration(seconds: 2));
+          library.returnUserBook(user!, book!);
+
+        } on UserException catch(err) {
+          print(err);
+        } on ObjectException catch(err) {
+          print(err);
         }
-        await Future.delayed(Duration(seconds: 2));
-        print('Usuario: ${user?.name} devolvio ${book?.title}');
+
         break;
-      
+
       case '7':
         // Devolver Revista
-      
+
         print('DEVOLVER REVISTA\n');
-        
+
         print('Usuario que va a devolver : ');
         final String name = stdin.readLineSync()?.trim() ?? '';
         User? user = library.findUserByName(name);
 
         print('Titlulo del libro a devolver: ');
         final String title = stdin.readLineSync()?.trim() ?? '';
-        Objectlibrary? magazine = library.findByTitle(title);
-        
-        if(user != null) {
-          library.userReturnMagazine(user, magazine as Magazine);
-        } else {
-          print('Usuario no registrado');
+        Magazine? magazine = library.findMagazineByTitle(title);
+
+          try { 
+          userValidate(user);
+          magazineValidate(magazine);
+
+          Future.delayed(Duration(seconds: 2));
+          library.returnUserMagazine(user!, magazine!);
+
+        } on UserException catch(err) {
+          print(err);
+        } on ObjectException catch(err) {
+          print(err);
         }
-        await Future.delayed(Duration(seconds: 2));
-        print('Usuario: ${user?.name} devolvio ${magazine?.title}');
+
         break;
-        
+
       case '8':
         // Mostrar catálogo completo
-        
+
         print('CATÁLOGO COMPLETO\n');
         library.showCataloge();
         break;
-        
+
       case '9':
         // Mostrar usuarios
         print('USUARIOS REGISTRADOS\n');
         library.showUsers();
         break;
-        
+
       case '10':
-        // Salir
-        print('Saliendo del sistema...');
-        break;
+        // Mostrar historial de usuario
+        print('MOSTRAR HISTORIAL DE USUARIO\n');
+
+        print('Nombre de usuario: ');
+        final String name = stdin.readLineSync()?.trim() ?? '';
+        User? user = library.findUserByName(name);
         
+        try { 
+          userValidate(user);  
+        } on UserException catch(err) {
+          print(err);
+        } 
+
+        if(user != null) {
+          print('\nBOOKS');
+          if(user.lentBooks.isNotEmpty){
+            for(var book in user.lentBooks){
+              book.showHistorial();
+            }
+          } else {
+            print('Usuario $name no tiene libros prestados\n');
+          }
+
+          print('\nMAGAZINES');
+          if(user.lentMagazines.isNotEmpty){
+            for(var magazine in user.lentMagazines){
+              magazine.showHistorial();
+            }
+          } else {
+            print('Usuario $name no esta leyendo revistas\n');
+          }
+        } else {
+          print('Usuario $name no está registrado\n');
+        }
+
+        break;
+
+      case '11':
+        // Salir
+        print('Saliendo del sistema...\n');
+        break;
+
       default:
-        print('\nOpción no válida. Por favor intente nuevamente.');
+        print('\nOpción no válida. Por favor intente nuevamente.\n');
     }
-  } while(optionMenu != '7');
+  } while (optionMenu != '7');
 }
 
 void menu() {
-  print(
-    '''
+  print('''
     ++++++++++++  MENÚ PRINCIPAL  +++++++++++++++++
     (1). Registrar usuario.
-    (2). Buscar Libro/Revista por ID.
-    (3). Buscar Libro/Revista por Título.
+    (2). Buscar Revista por Título.
+    (3). Buscar Libro por Título.
     (4). Leer Revista. 
     (5). Prestrar Libro. 
     (6). Devolver Libro. 
     (7). Devolver Revista. 
     (8). Mostrar Catálogo completo.
     (9). Mostrar usuarios registrados.
-    (10) Salir.
+    (10). Mostrar historial de usuario.
+    (11). Salir.
     
-    Ingrese una opción: '''
-  );
+    Ingrese una opción: ''');
 }
 
 String getUserID() {
   return (Random.secure().hashCode / 100000).round().toString();
 }
 
+void userValidate(User? user) {
+  if(user == null ){
+    throw UserException('Usuario no encontrado');
+  }
+}
+
+void bookValidate(Book? book) {
+  if(book == null) {
+    throw ObjectException('Libro no encontado');
+  }
+}
+
+void magazineValidate(Magazine? magazine) {
+  if(magazine == null) {
+    throw ObjectException('Revista no encontrada');
+  }
+}

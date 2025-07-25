@@ -14,9 +14,8 @@ class User {
     try {
       book.toLend();
       lentBooks.add(book);
-    } on ObjectException catch(err){
-      print(err);
-    } catch (err) {
+      print('Usuario $name tiene prestado ${book.title}');
+    } on ObjectException catch(err) {
       print(err);
     }
   }
@@ -25,50 +24,52 @@ class User {
     try {
       magazine.readObject();
       lentMagazines.add(magazine);
+      print('Usuario $name esta leyendo ${magazine.title}');
     } on ObjectException catch(err) {
       print(err);
-    } catch (err) {
-      print(err);
-    }
+    } 
   }
 
-  bool? returnBook(Book book) {
+  void returnBook(Book book) {
     if (lentBooks.contains(book)) {
       book.toReturn();
-      return lentBooks.remove(book);
+      lentBooks.remove(book);
+      print('Usuario devolvio ${book.title} ');
     } else {
-      return null;
-    }
+      print('Usuario $name no tiene este libro');
+    } 
+  
   }
 
-  bool? letReadMagazine(Magazine magazine) {
+  void letReadMagazine(Magazine magazine) {
     if (lentBooks.contains(magazine)) {
       magazine.letReadObject();
-      return lentMagazines.remove(magazine);
+      lentMagazines.remove(magazine);
+      print('Usuario $name dejo de leer ${magazine.title}');
     } else {
-      return null;
+      print('Usuario $name no tiene esta revista');
     }
   }
 
-  void showLentBooks() {
-    print('\n$name: Lent Book');
+  void showBooksOnLent() {
+    print('$name: Libros Prestados');
     if (lentBooks.isNotEmpty) {
       for (var lentBook in lentBooks) {
         lentBook.showInfo();
       }
     } else {
-      print("\n$name: Haven't Lent Books");
+      print("$name no tiene libros prestados");
     }
   }
 
-  void showLentMagazines() {
-    print('\n$name: Lent Magazines');
+  void showMagazinesOnReading() {
+    print('$name: Revistas en Lectura');
     if (lentMagazines.isNotEmpty) {
       for (var lentMagazine in lentMagazines) {
         lentMagazine.showInfo();
       }
     } else {
-      print("\n$name: Haven't Lent Magazine");
+      print("$name no esta leyendo revistas");
     }
   }
 

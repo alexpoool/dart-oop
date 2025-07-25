@@ -6,19 +6,19 @@ mixin Lend {
 
   void toLend() {
     if (isLend) {
-      throw ObjectException('Object Lent');
+      throw ObjectException('Objeto ya esta prestado prestado');
     }
     isLend = true;
-    lendHistorial.add('${DateTime.now().toIso8601String()} Object Lent ');
+    lendHistorial.add('${DateTime.now().toIso8601String()} Objeto Prestado');
   }
 
   void toReturn() {
     isLend = false;
-    lendHistorial.add('${DateTime.now()} Object Return');
+    lendHistorial.add('${DateTime.now()} Objeto devuelto');
   }
 
   void showHistorial() {
-    print('\nLent Historial');
+    print('Historial de prestados');
     for(var history in lendHistorial){ 
       print('- $history');
     }

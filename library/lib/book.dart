@@ -2,14 +2,20 @@ import 'lend.dart';
 import 'read.dart';
 import 'objectLibrary.dart';
 
-class Book extends Objectlibrary with Lend, Read {
+class Book with Lend, Read implements Objectlibrary {
   final String author;
   final String isbn;
+  @override
+  String id;
+  @override
+  String title;
+  @override
+  int yearPublication;
 
   Book({
-    required super.id,
-    required super.title,
-    required super.yearPublication,
+    required this.id,
+    required this.title,
+    required this.yearPublication,
     required this.author,
     required this.isbn,
   });
