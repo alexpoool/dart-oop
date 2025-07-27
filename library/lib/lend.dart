@@ -1,26 +1,34 @@
 import 'error.dart';
+import 'objectLibrary.dart';
 
 mixin Lend {
   bool isLend = false;
   List<String> lendHistorial = [];
 
-  void toLend() {
+  void toLend(Objectlibrary object) {
     if (isLend) {
-      throw ObjectException('Objeto ya esta prestado prestado');
+      throw ObjectException('Objeto: ${object.title}, ya esta prestado prestado');
     }
     isLend = true;
-    lendHistorial.add('${DateTime.now().toIso8601String()} Objeto Prestado');
+    lendHistorial.add('${DateTime.now()} Objeto: ${object.title}, Prestado');
   }
 
-  void toReturn() {
+  void toReturn(Objectlibrary object) {
     isLend = false;
-    lendHistorial.add('${DateTime.now()} Objeto devuelto');
+    lendHistorial.add('${DateTime.now()} Objeto: ${object.title}, devuelto');
   }
 
-  void showHistorial() {
-    print('Historial de prestados');
-    for(var history in lendHistorial){ 
-      print('- $history');
+  List<String> get getLendHistorial {
+   return lendHistorial;
+  }
+
+  void showLendHistorial(){
+    if(getLendHistorial.isNotEmpty) {
+      for(var history in getLendHistorial) {
+        print("- $history");
+      }
+    } else {
+      print('HIsitorial de PRESTADOS vacio');
     }
   }
 }

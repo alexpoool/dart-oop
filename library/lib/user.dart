@@ -12,7 +12,7 @@ class User {
 
   void takeLendBook(Book book) {
     try {
-      book.toLend();
+      book.toLend(book);
       lentBooks.add(book);
       print('Usuario $name tiene prestado ${book.title}');
     } on ObjectException catch(err) {
@@ -22,7 +22,7 @@ class User {
  
   void readMagazine(Magazine magazine) {
     try {
-      magazine.readObject();
+      magazine.readObject(magazine);
       lentMagazines.add(magazine);
       print('Usuario $name esta leyendo ${magazine.title}');
     } on ObjectException catch(err) {
@@ -32,7 +32,7 @@ class User {
 
   void returnBook(Book book) {
     if (lentBooks.contains(book)) {
-      book.toReturn();
+      book.toReturn(book);
       lentBooks.remove(book);
       print('Usuario devolvio ${book.title} ');
     } else {
@@ -42,34 +42,33 @@ class User {
   }
 
   void letReadMagazine(Magazine magazine) {
-    if (lentBooks.contains(magazine)) {
-      magazine.letReadObject();
-      lentMagazines.remove(magazine);
-      print('Usuario $name dejo de leer ${magazine.title}');
+    if (lentMagazines.contains(magazine)) {
+      magazine.letReadObject(magazine);
+      if(lentMagazines.remove(magazine)){
+        print('Usuario $name dejo de leer ${magazine.title}');
+      } else {
+        print('No se pudo devolver ${magazine.title}');
+      }
     } else {
       print('Usuario $name no tiene esta revista');
     }
   }
 
-  void showBooksOnLent() {
-    print('$name: Libros Prestados');
-    if (lentBooks.isNotEmpty) {
-      for (var lentBook in lentBooks) {
-        lentBook.showInfo();
-      }
+  void showHistorial() {
+    if(lentBooks.isNotEmpty){
+        for(var book in lentBooks) {
+          book.showLendHistorial();
+        }
     } else {
-      print("$name no tiene libros prestados");
+      print('Usuario $name no tiene libros prestados');
     }
-  }
 
-  void showMagazinesOnReading() {
-    print('$name: Revistas en Lectura');
-    if (lentMagazines.isNotEmpty) {
-      for (var lentMagazine in lentMagazines) {
-        lentMagazine.showInfo();
-      }
+    if(lentMagazines.isNotEmpty) {
+      for(var magazine in lentMagazines) {
+          magazine.showReadHistorial();
+        }
     } else {
-      print("$name no esta leyendo revistas");
+      print('Usuario $name no esta leyendo revistas');
     }
   }
 

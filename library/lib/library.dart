@@ -1,4 +1,5 @@
 import 'data.dart';
+import 'error.dart';
 import 'user.dart';
 import 'magazine.dart';
 import 'book.dart';
@@ -39,25 +40,10 @@ class Library {
     _users.add(user);
   }
 
-  Book? findBookByID(String id) {
-    for (var book in _bookCollection) {
-      if (book.id.toLowerCase() == id.toLowerCase()) {
-        return book;
-      }
-    }
-    return null;
-  }
-
-  Magazine? findMagazineByID(String id) {
-    for (var magazine in _magazineCollection) {
-      if (magazine.id.toLowerCase() == id.toLowerCase()) {
-        return magazine;
-      }
-    }
-    return null;
-  }
-
   Book? findBookByTitle(String title) {
+    if(title == '') {
+      throw ObjectException('Título no puede estar vacio');
+    }
     for (var book in _bookCollection) {
       if (book.title.toLowerCase() == title.toLowerCase()) {
         return book;
@@ -67,6 +53,9 @@ class Library {
   }
 
   Magazine? findMagazineByTitle(String title) {
+    if(title == '') {
+      throw ObjectException('Título no puede estar vacio');
+    }
     for (var magazine in _magazineCollection) {
       if (magazine.title.toLowerCase() == title.toLowerCase()) {
         return magazine;
@@ -76,6 +65,10 @@ class Library {
   }
 
   User? findUserByName(String name) {
+    if(name == '') {
+      throw UserException('Nombre no puede estar vacio');
+    }
+    
     for (var user in _users) {
       if (user.name.toLowerCase() == name.toLowerCase()) {
         return user;
